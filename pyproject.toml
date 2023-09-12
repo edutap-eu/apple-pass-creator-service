@@ -1,0 +1,11 @@
+[project]
+
+name = "apple_pass_creator"
+version = "0.1.0"
+
+dependencies = [
+    "passbook",
+    "fastapi",
+    "uvicorn",
+    "python-multipart",
+]
