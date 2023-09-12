@@ -1,46 +1,48 @@
-## Getting Started
+# Apple Passport Server
 
+## Cert stuff
 
-### request key from apple wit unix tools
+To run the passbook server you need a certificate and a private key. The certificate is used to sign the passbook files and the private key is used to sign the push notifications. The certificate and the private key are stored in the config file of the passbook server.
 
-```shell
-    $ openssl genrsa -out key.pem 2048
-    # $ openssl req -new -key key.pem -out request.pem
-    $ openssl req -new -key key.pem -out request.csr -subj="/emailAddress=phil@bluedynamics.com,CN=Philipp Auersperg,C=AT"
+```mermaid
+flowchart TD
+    A[start] --> B[create key.pem]
+    A --> D[get/create Pass ID - apple.com]
+    D --> E[request Certificate.cer based on Pass Id - apple.com]
+    B[create key.pem] --> C[create CSR]
+    C --> F[create+download Certificate.cer - apple.com]
+    E --> F
+    F --> G[create Certificate.pem]
+    G --> H[install Certificate.pem andprivate.key on server]
 ```
 
-if you self-sign the certificate, you can use the same key.pem for the certificate.pem
+### prepare key and CSR for requesting a certificate from apple
 
+- create your own private key
 ```shell
-    $ openssl x509 -req -days 365 -in request.csr -signkey key.pem -out certificate.pem
+$ openssl genrsa -out key.pem 2048
 ```
 
-if you need a real cert from apple you have to send the request.pem to apple and get the certificate.cer back and convert it to a certificate.pem file by calling
+- create a certificate signing request (CSR) with the private key
+```shell
+$ openssl req -new -key key.pem -out request.csr -subj="/emailAddress=[your email addr],CN=[your full name],C=[your country ISO code]"
+```
+
+
+### Get a Pass Type Id and certificate from Apple
+
+you need a developer account at apple to get a pass type id and a certificate for signing your passes. you can get a free developer account at [developer.apple.com](https://developer.apple.com/programs/)
+
+* Visit the iOS Provisioning [Portal -> Pass Type IDs -> New Pass Type ID](https://developer.apple.com/account/resources/identifiers/list/passTypeId)
+* Select pass type id -> Configure (Follow steps and download generated pass.cer file)
+* Use Keychain tool to export a Certificates.cer  file (need Apple Root Certificate installed)
+* Convert the certificate.cer (X509 format) to a certificate.pem file by calling
 
 ```shell
     $ openssl x509 -inform der -in pass.cer -out certificate.pem
 ```
 
+### Install certificate and private key on your server
 
-
-### blabla
-1) Get a Pass Type Id
-
-* Visit the iOS Provisioning Portal -> Pass Type IDs -> New Pass Type ID
-* Select pass type id -> Configure (Follow steps and download generated pass.cer file)
-* Use Keychain tool to export a Certificates.p12 file (need Apple Root Certificate installed)
-
-2) Generate the necessary certificate
-
-```shell
-    # $ openssl pkcs12 -in "Certificates.cer" -clcerts -nokeys -out certificate.pem   
-    $ openssl x509 -inform der -in Certificate.cer -out certificate.pem
-```
-3) Generate the key.pem
-
-```shell
-    # $ openssl pkcs12 -in "Certificates.p12" -nocerts -out private.key
-
-    openssl x509 -in "Certificate.cer" -nocerts -out Certificate-private.key
-```
+copy the certificate.pem and the key.pem to your server and install it in the right place. the path to the certificate and the key is defined in the config file of the passbook server.
 
