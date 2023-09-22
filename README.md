@@ -1,19 +1,23 @@
 # Apple Passport Server
 
-## Cert stuff
+## Installation Cert stuff
 
 To run the passbook server you need a certificate and a private key. The certificate is used to sign the passbook files and the private key is used to sign the push notifications. The certificate and the private key are stored in the config file of the passbook server.
 
+this is the overall process to get the necessary certificates for issuing passes
+
 ```mermaid
 flowchart TD
-    A[start] --> B[create key.pem]
-    A --> D[get/create Pass ID - apple.com]
+    B[create key.pem]
+    D[get/create Pass ID - apple.com]
+    WWDR[download AppleWWDRCA.cer] -->WWDRPEM[convert to wwdr_certificate.pem]
     D --> E[request Certificate.cer based on Pass Id - apple.com]
-    B[create key.pem] --> C[create CSR]
-    C --> F[create+download Certificate.cer - apple.com]
+    B[create key.pem] --> CSR[create CSR]
+    CSR -->|upload CSR in form| F[create+download Certificate.cer - apple.com]
     E --> F
-    F --> G[create Certificate.pem]
-    G --> H[install Certificate.pem andprivate.key on server]
+    F -->|x509| G[create Certificate.pem]
+    G --> H[install Certificate.pem, private.key and wwdr_certificate.pem on server]
+    WWDRPEM --> H
 ```
 
 ### prepare key and CSR for requesting a certificate from apple
@@ -42,7 +46,52 @@ you need a developer account at apple to get a pass type id and a certificate fo
     $ openssl x509 -inform der -in pass.cer -out certificate.pem
 ```
 
+### Apple Worldwide Developer Relations (WWDR) root certificate
+
+the certificate is preinstalled, but in case of expiration it can be downloaded from
+[https://developer.apple.com/certificationauthority/AppleWWDRCA.cer](apple authority)
+
+see [https://developer.apple.com/support/certificates/expiration/](apple support)
+
+```shell
+curl https://developer.apple.com/certificationauthority/AppleWWDRCA.cer -o AppleWWDRCA.cer
+```
+
+an overview of downloadable apple certs:
+
+https://www.apple.com/certificateauthority/
+
+convert it to a pem file
+
+```shell
+openssl x509 -inform der -in AppleWWDRCA.cer -out wwdr_certificate.pem
+```
+then copy it into the 'certs' folder of the passbook server
+
 ### Install certificate and private key on your server
 
-copy the certificate.pem and the key.pem to your server and install it in the right place. the path to the certificate and the key is defined in the config file of the passbook server.
+copy the certificate.pem and the key.pem to the 'certa' directory your server.
 
+see [documentation @ apple](https://developer.apple.com/documentation/walletpasses/building_a_pass)
+
+check expiration date of certificate
+
+```shell
+openssl x509 -enddate -noout -in file.pem
+```
+
+## What we want to have
+
+- [ ] a server that can create passes
+- [ ] support for pass template files
+
+## Plans for the future
+
+### rewrite of passbook package
+
+- [ ] contact author of passbook package 
+- [ ] rewirte models.py using pydanticv2
+- [ ] smart tapping (Apple VAS)
+- [ ] BarCodes
+
+- [ ] messaging/updating passes

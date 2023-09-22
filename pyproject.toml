@@ -8,4 +8,5 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "python-multipart",
+    "edutap.wallet_apple"
 ]
