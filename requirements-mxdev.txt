@@ -1,0 +1,9 @@
+###############################################################################
+# mxdev combined constraints
+-c constraints-mxdev.txt
+
+
+###############################################################################
+# mxdev development sources
+-e ./sources/edutap.wallet_apple --install-option="--pre"
+
