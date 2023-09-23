@@ -88,7 +88,7 @@ openssl x509 -enddate -noout -in file.pem
 
 ### Install certificate and private key for integration tests
 
-copy the `certificate.pem`, `private.key` and `wwdr_certificate.pem` to the 'certs' directory your server.
+copy the `certificate.pem`, `private.key` and `wwdr_certificate.pem` to the 'certs' directory in your server.
 
 ## run the integration tests
 
