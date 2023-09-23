@@ -2,6 +2,13 @@
 
 Simple FastAPI server to create Apple Wallet passes.
 
+## Installation
+
+```shell
+make install
+```
+this installs the software + all the dependencies
+
 ## Installation Cert stuff
 
 To run the passbook server you need a certificate and a private key. The certificate is used to sign the passbook files and the private key is used to sign the push notifications. The certificate and the private key are stored in the config file of the passbook server.
