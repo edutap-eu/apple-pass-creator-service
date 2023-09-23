@@ -102,3 +102,13 @@ check expiration date of certificate
 openssl x509 -enddate -noout -in file.pem
 ```
 
+## Try it
+
+### run the server
+
+```shell
+./run.sh
+```
+
+
+you can point your apple device to <host>:8000/demo-pass to get a demo passbook file that you then can install into your wallet.
