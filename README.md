@@ -102,18 +102,3 @@ check expiration date of certificate
 openssl x509 -enddate -noout -in file.pem
 ```
 
-## What we want to have
-
-- [ ] a server that can create passes
-- [ ] support for pass template files
-
-## Plans for the future
-
-### rewrite of passbook package
-
-- [ ] contact author of passbook package 
-- [ ] rewirte models.py using pydanticv2
-- [ ] smart tapping (Apple VAS)
-- [ ] BarCodes
-
-- [ ] messaging/updating passes
