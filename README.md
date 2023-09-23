@@ -1,5 +1,7 @@
 # Apple Passport Server
 
+Simple FastAPI server to create Apple Wallet passes.
+
 ## Installation Cert stuff
 
 To run the passbook server you need a certificate and a private key. The certificate is used to sign the passbook files and the private key is used to sign the push notifications. The certificate and the private key are stored in the config file of the passbook server.
@@ -8,7 +10,7 @@ this is the overall process to get the necessary certificates for issuing passes
 
 ```mermaid
 flowchart TD
-    B[create key.pem]
+    B[create private key.pem]
     D[get/create Pass ID - apple.com]
     WWDR[download AppleWWDRCA.cer] -->WWDRPEM[convert to wwdr_certificate.pem]
     D --> E[request Certificate.cer based on Pass Id - apple.com]
@@ -24,12 +26,12 @@ flowchart TD
 
 - create your own private key
 ```shell
-$ openssl genrsa -out key.pem 2048
+$ openssl genrsa -out private.key 2048
 ```
 
 - create a certificate signing request (CSR) with the private key
 ```shell
-$ openssl req -new -key key.pem -out request.csr -subj="/emailAddress=[your email addr],CN=[your full name],C=[your country ISO code]"
+$ openssl req -new -key private.key -out request.csr -subj="/emailAddress=[your email addr],CN=[your full name],C=[your country ISO code]"
 ```
 
 
@@ -68,9 +70,29 @@ openssl x509 -inform der -in AppleWWDRCA.cer -out wwdr_certificate.pem
 ```
 then copy it into the 'certs' folder of the passbook server
 
+
+see [documentation @ apple](https://developer.apple.com/documentation/walletpasses/building_a_pass)
+
+check expiration date of certificate
+
+```shell
+openssl x509 -enddate -noout -in file.pem
+```
+
+### Install certificate and private key for integration tests
+
+copy the `certificate.pem`, `private.key` and `wwdr_certificate.pem` to the 'certs' directory your server.
+
+## run the integration tests
+
+```shell
+pytest -m integration
+```
+
+the test "test_passbook_creation_integration" will create a passbook file and display it with the passbook viewer. This test runs just under OSX.
 ### Install certificate and private key on your server
 
-copy the certificate.pem and the key.pem to the 'certa' directory your server.
+copy the certificate.pem and the key.pem to the 'certs' directory your server.
 
 see [documentation @ apple](https://developer.apple.com/documentation/walletpasses/building_a_pass)
 
