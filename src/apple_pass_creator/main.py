@@ -57,7 +57,7 @@ global_serial = 100000
 
 
 @app.get("/demo-pass", response_class=FileResponse)
-def demo_pass(password: str = "", serial: str = "1234567890", name: str = "John Doe"):
+def demo_pass(name: str = "John Doe", serial: str = "1234567890",  password: str = ""):
     global global_serial
 
 
@@ -70,4 +70,25 @@ def demo_pass(password: str = "", serial: str = "1234567890", name: str = "John 
         buf.getvalue(),
         media_type="application/vnd.apple.pkpass",
         headers={"Content-Disposition": 'attachment; filename="pass.pkpass"'},
+    )
+
+
+@app.get("/demo-pass-nfc", response_class=FileResponse)
+def demo_pass_nfc(name: str = "", serial: str="1234567890", password: str = ""):
+    global global_serial
+
+    passfile = create_shell_pass(serial=str(global_serial), name=name)
+    global_serial += 1
+    passfile.addFile("icon.png", open(static / "white_square.png", "rb"))
+    buf: BytesIO = passfile.create(certificate_file, key_file, apple_root_certificate_file, password)
+
+    passfile.nfc = pmodels.NFC(
+        message="Hello World", 
+        encryptionPublicKey="MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADwKMBv29ByaSLiGF0FctuyB+Hs2oZ1kDIYhTVllPexNE="
+    )
+
+    return Response(
+        buf.getvalue(),
+        media_type="application/vnd.apple.pkpass",
+        headers={"Content-Disposition": 'attachment; filename="pass-nfc.pkpass"'},
     )
